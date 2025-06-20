@@ -122,11 +122,11 @@ async def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     # inside main()
-app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.warn$'), warn_user))
-app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.mute$'), mute_user))
-app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.ban$'), ban_user))
+    app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.warn$'), warn_user))
+    app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.mute$'), mute_user))
+    app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.ban$'), ban_user))
 
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
 
     print("\nSenorita is live! DM ya group me kuch bolke dekho 💃")
