@@ -16,7 +16,7 @@ from telegram.ext import (
 
 from character import CHARACTER_PROFILE
 from group_commands import warn_user, mute_user, ban_user, unmute_user, unwarn_user, unban_user
-from owner_commands import handle_owner_command, owner_warn_user
+from owner_commands import handle_owner_command
 from keep_alive import keep_alive
 import g4f
 
@@ -137,9 +137,6 @@ async def main():
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.unmute$'), unmute_user))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.unban$'), unban_user))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.unwarn$'), unwarn_user))
-
-    # Plain command from owner: "senorita warn"
-    app.add_handler(MessageHandler(filters.Regex(r'(?i)^senorita warn$') & filters.ChatType.GROUPS, warn_user))
 
     # AI Message Handler
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
