@@ -2,8 +2,10 @@ import logging
 import asyncio
 import nest_asyncio
 import random
+import re
+import os
 
-from telegram import Update
+from telegram import Update, ChatPermissions
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -17,7 +19,7 @@ from group_commands import warn_user, mute_user, ban_user
 from owner_commands import handle_owner_command
 from keep_alive import keep_alive
 import g4f
-import os
+
 keep_alive()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
@@ -26,19 +28,15 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-# Memory to keep previous messages
 previous_chats = []
-
 
 async def ai_reply(text):
     try:
         text_lower = text.lower()
 
-        # Custom replies if someone calls her a bot
         if any(word in text_lower for word in ["bot ho", "you bot", "tum bot", "you ai", "artificial"]):
             return random.choice(CHARACTER_PROFILE["deny_bot"])
 
-        # Intro reply if asked
         if any(q in text_lower for q in ["who are you", "what are you", "introduce", "apna parichay"]):
             interest = random.choice(CHARACTER_PROFILE["interests"])
             intro = CHARACTER_PROFILE["intro"]
@@ -49,12 +47,10 @@ async def ai_reply(text):
                 f"{intro[3]}"
             )
 
-        # Prepare chat memory
         previous_chats.append({"role": "user", "content": text})
         if len(previous_chats) > 10:
             previous_chats.pop(0)
 
-        # System role prompt
         system_prompt = {
             "role": "system",
             "content": (
@@ -70,11 +66,9 @@ async def ai_reply(text):
                 "Agar koi 'owner', 'creator', ya 'kisne banaya' jaisa kuch poochhe, toh tum apne owner ke baare me khud se sweet aur smiley tone me batana. "
                 "User ke mood ke hisaab se baat karo, real ladki ki tarah 💕"
                 "Reply user ke mood ke hisaab se do – kabhi short, kabhi thoda long, jaise real ladki baat karti hai. Har baat pe unnecessary sawal mat poochho."
-
             )
         }
 
-        # AI reply from G4F
         response = await g4f.ChatCompletion.create_async(
             model=g4f.models.gpt_4,
             messages=[system_prompt] + previous_chats
@@ -108,7 +102,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await handle_owner_command(update, context)
         await context.bot.send_chat_action(chat_id=message.chat.id, action="typing")
 
-        # Short greeting reply
         if any(name in user_msg for name in ["senorita", "sñorita", "senorita ji", "senorita didi"]):
             if len(user_msg.strip()) <= len("senorita") + 4:
                 reply = random.choice(["Hii", "Hey", "Hello", "Heeey", "Hiiii"])
@@ -117,7 +110,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await message.reply_text(reply)
                 return
 
-        # Full AI response
         reply = await ai_reply(message.text)
         await message.reply_text(reply)
 
@@ -129,10 +121,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
-    # Group commands
-    app.add_handler(CommandHandler("warn", warn_user))
-    app.add_handler(CommandHandler("mute", mute_user))
-    app.add_handler(CommandHandler("ban", ban_user))
+    # Group commands (.warn, .mute, .ban)
+    app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'^\\.warn$'), warn_user))
+    app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'^\\.mute$'), mute_user))
+    app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'^\\.ban$'), ban_user))
 
     # Message handler
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
