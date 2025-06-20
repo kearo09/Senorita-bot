@@ -102,7 +102,7 @@ async def mute_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     user = update.message.reply_to_message.from_user
-    user_id = str(user.id)
+    user_id = user.id
     
     if int(user_id) in OWNER_IDS:
         await update.message.reply_text("😇 Sorry, me apne owner ko mute nahi kar sakti 😒")
@@ -132,8 +132,9 @@ async def ban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if await is_target_admin(update, context):
         await update.message.reply_text("❌ Admin ko ban nahi kar sakte boss 😅")
         return
+    
     user = update.message.reply_to_message.from_user
-    user_id = str(user.id)
+    user_id = user.id
     if int(user_id) in OWNER_IDS:
         await update.message.reply_text("😇 Sorry, me apne owner ko ban nahi kar sakti 😒")
         return
@@ -157,8 +158,9 @@ async def unwarn_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if await is_target_admin(update, context):
         await update.message.reply_text("❌ Admin h wo, Dekh to lia karo 😒")
         return
+    
     user = update.message.reply_to_message.from_user
-    user_id = str(user.id)
+    user_id = user.id
     if int(user_id) in OWNER_IDS:
         await update.message.reply_text("Mera owner h wo, dek to lo 😒")
         return
@@ -188,8 +190,9 @@ async def unmute_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if await is_target_admin(update, context):
         await update.message.reply_text("❌ Admin h wo, Dekh to lia karo 😒")
         return
+    
     user = update.message.reply_to_message.from_user
-    user_id = str(user.id)
+    user_id = user.id
 
     if int(user_id) in OWNER_IDS:
         await update.message.reply_text("Mera owner h wo, dek to lo 😒")
@@ -218,8 +221,9 @@ async def unban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if await is_target_admin(update, context):
         await update.message.reply_text("❌ Admin h wo, Dekh to lia karo 😒")
         return
+   
     user = update.message.reply_to_message.from_user
-    user_id = str(user.id)
+    user_id = user.id
     
     if int(user_id) in OWNER_IDS:
         await update.message.reply_text("Mera owner h wo, dek to lo 😒")
