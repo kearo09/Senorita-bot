@@ -8,6 +8,14 @@ from telegram.ext import ContextTypes
 import json
 import os
 
+async def is_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    chat_id = update.effective_chat.id
+
+    member = await context.bot.get_chat_member(chat_id, user_id)
+    return member.status in ['administrator', 'creator']
+
+
 # Warns file to store warnings per group
 WARN_FILE = "warns.json"
 
