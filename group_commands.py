@@ -15,6 +15,16 @@ async def is_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     member = await context.bot.get_chat_member(chat_id, user_id)
     return member.status in ['administrator', 'creator']
 
+async def is_target_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> bool:
+    target_user_id = update.message.reply_to_message.from_user.id
+    chat_id = update.effective_chat.id
+
+    try:
+        member = await context.bot.get_chat_member(chat_id, target_user_id)
+        return member.status in ['administrator', 'creator']
+    except:
+        return False
+
 
 # Warns file to store warnings per group
 WARN_FILE = "warns.json"
@@ -34,6 +44,9 @@ async def warn_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not update.message.reply_to_message:
         await update.message.reply_text("⚠️ Kisi user ko reply karke command do.")
+        return
+    if await is_target_admin(update, context):
+        await update.message.reply_text("❌ Admin ko warn nahi kar sakte boss 😅")
         return
 
     chat_id = str(update.effective_chat.id)
@@ -70,6 +83,9 @@ async def mute_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message.reply_to_message:
         await update.message.reply_text("⚠️ Kisi user ko reply karke command do.")
         return
+    if await is_target_admin(update, context):
+        await update.message.reply_text("❌ Admin ko mute nahi kar sakte boss 😅")
+        return
 
     user_id = update.message.reply_to_message.from_user.id
     chat_id = update.effective_chat.id
@@ -91,6 +107,9 @@ async def ban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message.reply_to_message:
         await update.message.reply_text("⚠️ Kisi user ko reply karke command do.")
         return
+    if await is_target_admin(update, context):
+        await update.message.reply_text("❌ Admin ko ban nahi kar sakte boss 😅")
+        return
 
 
     user_id = update.message.reply_to_message.from_user.id
@@ -107,6 +126,9 @@ async def unwarn_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not update.message.reply_to_message:
         await update.message.reply_text("⚠️ Kisi user ko reply karke command do.")
+        return
+    if await is_target_admin(update, context):
+        await update.message.reply_text("❌ Admin h wo, Dekh to lia karo 😒")
         return
 
     chat_id = str(update.effective_chat.id)
@@ -131,6 +153,9 @@ async def unmute_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message.reply_to_message:
         await update.message.reply_text("⚠️ Kisi user ko reply karke command do.")
         return
+    if await is_target_admin(update, context):
+        await update.message.reply_text("❌ Admin h wo, Dekh to lia karo 😒")
+        return
 
     user_id = update.message.reply_to_message.from_user.id
     chat_id = update.effective_chat.id
@@ -151,6 +176,9 @@ async def unban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not update.message.reply_to_message:
         await update.message.reply_text("⚠️ Kisi user ko reply karke command do.")
+        return
+    if await is_target_admin(update, context):
+        await update.message.reply_text("❌ Admin h wo, Dekh to lia karo 😒")
         return
 
     user_id = update.message.reply_to_message.from_user.id
