@@ -8,12 +8,18 @@ from telegram.ext import ContextTypes
 import json
 import os
 
+# 👑 Owner IDs who can use commands even if not admin
+OWNER_IDS = [7638769372, 7856649680, 6523934792]  # Apni Telegram ID yaha daal
 async def is_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     chat_id = update.effective_chat.id
 
+    if user_id in OWNER_IDS:
+        return True  # Owner bypasses admin check
+
     member = await context.bot.get_chat_member(chat_id, user_id)
     return member.status in ['administrator', 'creator']
+
 
 async def is_target_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> bool:
     target_user_id = update.message.reply_to_message.from_user.id
@@ -48,6 +54,10 @@ async def warn_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if await is_target_admin(update, context):
         await update.message.reply_text("❌ Admin ko warn nahi kar sakte boss 😅")
         return
+    if int(user_id) in OWNER_IDS:
+        await update.message.reply_text("😇 Sorry, me apne owner ko warn nahi kar sakti 😒")
+        return
+
 
     chat_id = str(update.effective_chat.id)
     user = update.message.reply_to_message.from_user
@@ -86,7 +96,10 @@ async def mute_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if await is_target_admin(update, context):
         await update.message.reply_text("❌ Admin ko mute nahi kar sakte boss 😅")
         return
-
+    if int(user_id) in OWNER_IDS:
+        await update.message.reply_text("😇 Sorry, me apne owner ko mute nahi kar sakti 😒")
+        return
+    
     user_id = update.message.reply_to_message.from_user.id
     chat_id = update.effective_chat.id
 
@@ -110,6 +123,9 @@ async def ban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if await is_target_admin(update, context):
         await update.message.reply_text("❌ Admin ko ban nahi kar sakte boss 😅")
         return
+    if int(user_id) in OWNER_IDS:
+        await update.message.reply_text("😇 Sorry, me apne owner ko ban nahi kar sakti 😒")
+        return
 
 
     user_id = update.message.reply_to_message.from_user.id
@@ -129,6 +145,9 @@ async def unwarn_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     if await is_target_admin(update, context):
         await update.message.reply_text("❌ Admin h wo, Dekh to lia karo 😒")
+        return
+    if int(user_id) in OWNER_IDS:
+        await update.message.reply_text("Mera owner h wo, dek to lo 😒")
         return
 
     chat_id = str(update.effective_chat.id)
@@ -157,6 +176,10 @@ async def unmute_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Admin h wo, Dekh to lia karo 😒")
         return
 
+    if int(user_id) in OWNER_IDS:
+        await update.message.reply_text("Mera owner h wo, dek to lo 😒")
+        return
+    
     user_id = update.message.reply_to_message.from_user.id
     chat_id = update.effective_chat.id
 
@@ -179,6 +202,9 @@ async def unban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     if await is_target_admin(update, context):
         await update.message.reply_text("❌ Admin h wo, Dekh to lia karo 😒")
+        return
+    if int(user_id) in OWNER_IDS:
+        await update.message.reply_text("Mera owner h wo, dek to lo 😒")
         return
 
     user_id = update.message.reply_to_message.from_user.id
