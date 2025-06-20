@@ -54,14 +54,18 @@ async def warn_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if await is_target_admin(update, context):
         await update.message.reply_text("❌ Admin ko warn nahi kar sakte boss 😅")
         return
+
+    user = update.message.reply_to_message.from_user
+    user_id = str(user.id)
+    
     if int(user_id) in OWNER_IDS:
         await update.message.reply_text("😇 Sorry, me apne owner ko warn nahi kar sakti 😒")
         return
 
 
     chat_id = str(update.effective_chat.id)
-    user = update.message.reply_to_message.from_user
-    user_id = str(user.id)
+    # user = update.message.reply_to_message.from_user
+    # user_id = str(user.id)
 
     if chat_id not in warn_data:
         warn_data[chat_id] = {}
@@ -96,12 +100,17 @@ async def mute_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if await is_target_admin(update, context):
         await update.message.reply_text("❌ Admin ko mute nahi kar sakte boss 😅")
         return
+
+    user = update.message.reply_to_message.from_user
+    user_id = str(user.id)
+    
     if int(user_id) in OWNER_IDS:
         await update.message.reply_text("😇 Sorry, me apne owner ko mute nahi kar sakti 😒")
         return
+        
     
-    user_id = update.message.reply_to_message.from_user.id
-    chat_id = update.effective_chat.id
+    # user_id = update.message.reply_to_message.from_user.id
+    # chat_id = update.effective_chat.id
 
     await context.bot.restrict_chat_member(
         chat_id=chat_id,
@@ -123,13 +132,15 @@ async def ban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if await is_target_admin(update, context):
         await update.message.reply_text("❌ Admin ko ban nahi kar sakte boss 😅")
         return
+    user = update.message.reply_to_message.from_user
+    user_id = str(user.id)
     if int(user_id) in OWNER_IDS:
         await update.message.reply_text("😇 Sorry, me apne owner ko ban nahi kar sakti 😒")
         return
 
 
-    user_id = update.message.reply_to_message.from_user.id
-    chat_id = update.effective_chat.id
+    # user_id = update.message.reply_to_message.from_user.id
+    # chat_id = update.effective_chat.id
 
     await context.bot.ban_chat_member(chat_id=chat_id, user_id=user_id)
     await update.message.reply_text("🚫 User ko group se ban kar diya gaya hai.")
@@ -146,12 +157,14 @@ async def unwarn_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if await is_target_admin(update, context):
         await update.message.reply_text("❌ Admin h wo, Dekh to lia karo 😒")
         return
+    user = update.message.reply_to_message.from_user
+    user_id = str(user.id)
     if int(user_id) in OWNER_IDS:
         await update.message.reply_text("Mera owner h wo, dek to lo 😒")
         return
 
-    chat_id = str(update.effective_chat.id)
-    user_id = str(update.message.reply_to_message.from_user.id)
+    # chat_id = str(update.effective_chat.id)
+    # user_id = str(update.message.reply_to_message.from_user.id)
 
     if chat_id in warn_data and user_id in warn_data[chat_id]:
         del warn_data[chat_id][user_id]
@@ -175,13 +188,15 @@ async def unmute_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if await is_target_admin(update, context):
         await update.message.reply_text("❌ Admin h wo, Dekh to lia karo 😒")
         return
+    user = update.message.reply_to_message.from_user
+    user_id = str(user.id)
 
     if int(user_id) in OWNER_IDS:
         await update.message.reply_text("Mera owner h wo, dek to lo 😒")
         return
     
-    user_id = update.message.reply_to_message.from_user.id
-    chat_id = update.effective_chat.id
+    # user_id = update.message.reply_to_message.from_user.id
+    # chat_id = update.effective_chat.id
 
     await context.bot.restrict_chat_member(
         chat_id=chat_id,
@@ -203,12 +218,12 @@ async def unban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if await is_target_admin(update, context):
         await update.message.reply_text("❌ Admin h wo, Dekh to lia karo 😒")
         return
+    user = update.message.reply_to_message.from_user
+    user_id = str(user.id)
+    
     if int(user_id) in OWNER_IDS:
         await update.message.reply_text("Mera owner h wo, dek to lo 😒")
         return
-
-    user_id = update.message.reply_to_message.from_user.id
-    chat_id = update.effective_chat.id
 
     await context.bot.unban_chat_member(chat_id=chat_id, user_id=user_id)
     await update.message.reply_text("🙌 User ko group se unban kar diya gaya hai.")
