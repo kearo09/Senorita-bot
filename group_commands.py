@@ -3,75 +3,88 @@ from telegram import Update, ChatPermissions
 from telegram.ext import ContextTypes
 
 # Group-wise user warning tracking
-user_warnings = {}
+from telegram import Update, ChatPermissions
+from telegram.ext import ContextTypes
+import json
+import os
+
+# Warns file to store warnings per group
+WARN_FILE = "warns.json"
+
+# Load or create warn data
+if os.path.exists(WARN_FILE):
+    with open(WARN_FILE, "r") as f:
+        warn_data = json.load(f)
+else:
+    warn_data = {}
 
 async def warn_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not update.message.reply_to_message:
-        await update.message.reply_text("Kisiko warn karna hai toh uske message pe reply karo na! 😤")
+    if not await is_admin(update, context):
+        await update.message.reply_text("⛔ Ye command sirf admins ke liye hai!")
         return
 
+    if not update.message.reply_to_message:
+        await update.message.reply_text("⚠️ Kisi user ko reply karke command do.")
+        return
+
+    chat_id = str(update.effective_chat.id)
     user = update.message.reply_to_message.from_user
-    chat_id = update.message.chat_id
+    user_id = str(user.id)
 
-    if chat_id not in user_warnings:
-        user_warnings[chat_id] = {}
+    if chat_id not in warn_data:
+        warn_data[chat_id] = {}
 
-    if user.id not in user_warnings[chat_id]:
-        user_warnings[chat_id][user.id] = 0
+    if user_id not in warn_data[chat_id]:
+        warn_data[chat_id][user_id] = 0
 
-    user_warnings[chat_id][user.id] += 1
-    warnings = user_warnings[chat_id][user.id]
+    warn_data[chat_id][user_id] += 1
+    warns = warn_data[chat_id][user_id]
 
-    if warnings >= 3:
-        await context.bot.ban_chat_member(chat_id, user.id)
-        await update.message.reply_text(
-            f"Bahut ho gaya {user.first_name}! 3 warnings ke baad group se bye bye! 😠"
-        )
+    with open(WARN_FILE, "w") as f:
+        json.dump(warn_data, f)
+
+    if warns >= 3:
+        await context.bot.ban_chat_member(chat_id=int(chat_id), user_id=int(user_id))
+        await update.message.reply_text(f"🚫 {user.first_name} ko 3 warnings ke baad ban kar diya gaya hai.")
+        del warn_data[chat_id][user_id]
+        with open(WARN_FILE, "w") as f:
+            json.dump(warn_data, f)
     else:
-        await update.message.reply_text(
-            f"{user.first_name}, Warning {warnings}/3! Aur masti ki toh ban karenge! 😡"
-        )
+        await update.message.reply_text(f"⚠️ {user.first_name} ko warning di gayi hai. ({warns}/3)")
+
 
 async def mute_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not update.message.reply_to_message:
-        await update.message.reply_text("Kisko mute karna hai? Reply karo uske message pe! 😶")
+    if not await is_admin(update, context):
+        await update.message.reply_text("⛔ Ye command sirf admins ke liye hai!")
         return
 
-    user = update.message.reply_to_message.from_user
-    chat_id = update.message.chat_id
+    if not update.message.reply_to_message:
+        await update.message.reply_text("⚠️ Kisi user ko reply karke command do.")
+        return
 
-    try:
-        mute_duration = int(context.args[0]) if context.args else 5
-    except:
-        mute_duration = 5
-
-    until_date = datetime.now() + timedelta(minutes=mute_duration)
+    user_id = update.message.reply_to_message.from_user.id
+    chat_id = update.effective_chat.id
 
     await context.bot.restrict_chat_member(
         chat_id=chat_id,
-        user_id=user.id,
-        permissions=ChatPermissions(
-            can_send_messages=False,
-            can_send_media_messages=False,
-            can_send_other_messages=False,
-            can_add_web_page_previews=False
-        ),
-        until_date=until_date
+        user_id=user_id,
+        permissions=ChatPermissions(can_send_messages=False)
     )
 
-    await update.message.reply_text(
-        f"{user.first_name} ko {mute_duration} minutes ke liye mute kar diya gaya 😷"
-    )
+    await update.message.reply_text("🔇 User ko permanently mute kar diya gaya hai.")
+
 
 async def ban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not update.message.reply_to_message:
-        await update.message.reply_text("Ban karna hai? Reply toh karo bhai uske message pe! 😑")
+    if not await is_admin(update, context):
+        await update.message.reply_text("⛔ Ye command sirf admins ke liye hai!")
         return
 
-    user = update.message.reply_to_message.from_user
-    chat_id = update.message.chat_id
+    if not update.message.reply_to_message:
+        await update.message.reply_text("⚠️ Kisi user ko reply karke command do.")
+        return
 
-    await context.bot.ban_chat_member(chat_id, user.id)
-    await update.message.reply_text(
-        f"{user.first_name} ko group se ban kar diya gaya! 🚫👋"
-    )
+    user_id = update.message.reply_to_message.from_user.id
+    chat_id = update.effective_chat.id
+
+    await context.bot.ban_chat_member(chat_id=chat_id, user_id=user_id)
+    await update.message.reply_text("🚫 User ko group se ban kar diya gaya hai.")
