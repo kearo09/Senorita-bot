@@ -16,7 +16,7 @@ from telegram.ext import (
 
 from character import CHARACTER_PROFILE
 from group_commands import warn_user, mute_user, ban_user, unmute_user, unwarn_user, unban_user
-from owner_commands import handle_owner_command
+from owner_commands import handle_owner_command, owner_warn_user
 from keep_alive import keep_alive
 import g4f
 
