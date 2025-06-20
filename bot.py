@@ -18,6 +18,7 @@ from owner_commands import handle_owner_command
 from keep_alive import keep_alive
 import g4f
 import os
+keep_alive()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 logging.basicConfig(
@@ -142,7 +143,6 @@ async def main():
 
 
 def run_bot():
-    keep_alive()
     nest_asyncio.apply()
     loop = asyncio.get_event_loop()
     loop.create_task(main())
