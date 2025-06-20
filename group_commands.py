@@ -27,6 +27,7 @@ else:
     warn_data = {}
 
 async def warn_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
+     print("⚠️ warn_user triggered")
     if not await is_admin(update, context):
         await update.message.reply_text("⛔ Ye command sirf admins ke liye hai!")
         return
