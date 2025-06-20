@@ -121,13 +121,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
-    # Group commands (.warn, .mute, .ban)
-    app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'^\\.warn$'), warn_user))
-    app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'^\\.mute$'), mute_user))
-    app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'^\\.ban$'), ban_user))
+    # inside main()
+app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.warn$'), warn_user))
+app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.mute$'), mute_user))
+app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.ban$'), ban_user))
 
-    # Message handler
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+
 
     print("\nSenorita is live! DM ya group me kuch bolke dekho 💃")
 
