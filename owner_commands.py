@@ -38,7 +38,7 @@ ADMIN_WARN_BLOCK = "Sorry owner 😇 admin ko warn nahi kar sakti..."
 NO_POWER_REPLY = "Sorry owner 😔 mere paas warn dene ka power nahi hai..."
 
 # ✅ Warn Handler Function
-async def warn_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def owner_warn_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.message
     sender = message.from_user
     chat_id = update.effective_chat.id
