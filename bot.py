@@ -142,6 +142,7 @@ async def main():
 
 
 def run_bot():
+    keep_alive()
     nest_asyncio.apply()
     loop = asyncio.get_event_loop()
     loop.create_task(main())
