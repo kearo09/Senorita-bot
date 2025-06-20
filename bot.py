@@ -4,7 +4,7 @@ import nest_asyncio
 import random
 import re
 import os
-
+from owner_commands import warn_user
 from telegram import Update, ChatPermissions
 from telegram.ext import (
     ApplicationBuilder,
@@ -128,7 +128,7 @@ async def main():
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.unmute$'), unmute_user))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.unban$'), unban_user))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.unwarn$'), unwarn_user))
-
+    app.add_handler(MessageHandler(filters.Regex(r'^(?i)^\ warn$') & filters.ChatType.GROUPS, warn_user))
 
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
