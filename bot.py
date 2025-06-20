@@ -17,8 +17,8 @@ from group_commands import warn_user, mute_user, ban_user
 from owner_commands import handle_owner_command
 from keep_alive import keep_alive
 import g4f
-
-BOT_TOKEN = "7888034457:AAHjb4EnlkUd2n7H_M01y1hvCM76eZwViec"
+import os
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
