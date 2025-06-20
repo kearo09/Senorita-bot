@@ -42,6 +42,15 @@ async def owner_warn_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.message
     sender = message.from_user
     chat_id = update.effective_chat.id
+    user_msg = message.text.lower()
+
+    # Check if message is from owner
+    if sender.id not in OWNER_IDS:
+        return  # Not owner, ignore
+
+    # Check if message contains intent to warn
+    if not any(word in user_msg for word in ["warn", "warning", "isko warn", "isko warning", "senorita warn"]):
+        return  # Message doesn't contain warn command
 
     if not message.reply_to_message:
         await message.reply_text("Owner ji, please reply to the user's message you want to warn 😇")
@@ -59,16 +68,8 @@ async def owner_warn_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await message.reply_text(ADMIN_WARN_BLOCK)
         return
 
-    # If sender is not bot owner, must be admin
-    sender_is_owner = sender.id in OWNER_IDS
-    sender_status = (await context.bot.get_chat_member(chat_id, sender.id)).status
-    sender_is_admin = sender_status in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER]
-
-    if not sender_is_owner and not sender_is_admin:
-        return  # Ignore non-owner, non-admins
-
-    # If sender is not owner, bot must have rights
-    if not sender_is_owner and not bot_member.can_restrict_members:
+    # Check bot permission
+    if not bot_member.can_restrict_members:
         await message.reply_text(NO_POWER_REPLY)
         return
 
@@ -81,9 +82,19 @@ async def owner_warn_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     warn_data[chat_id][target_id] += 1
     count = warn_data[chat_id][target_id]
 
-    reply_text = random.choice(WARN_REPLIES)
-    await message.reply_text(f"{reply_text}\n⚠️ Total warnings: {count}")
-
+    if count >= 3:
+        try:
+            await context.bot.ban_chat_member(chat_id, target_id)
+            await message.reply_text(
+                f"{random.choice(WARN_REPLIES)}\n⚠️ Total warnings: {count}\n🚫 User banned automatically on 3rd warning!"
+            )
+            warn_data[chat_id][target_id] = 0
+        except Exception as e:
+            await message.reply_text(
+                f"{random.choice(WARN_REPLIES)}\n⚠️ Total warnings: {count}\nBut sorry owner, ban nahi kar payi 😔\nReason: {e}"
+            )
+    else:
+        await message.reply_text(f"{random.choice(WARN_REPLIES)}\n⚠️ Total warnings: {count}")
 
 
 async def handle_owner_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
