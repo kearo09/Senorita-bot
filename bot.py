@@ -2,14 +2,14 @@ import logging
 import asyncio
 import nest_asyncio
 import random
-import re
 import os
-from owner_commands import warn_user
+import re
+
 from telegram import Update, ChatPermissions
 from telegram.ext import (
     ApplicationBuilder,
-    CommandHandler,
     MessageHandler,
+    CommandHandler,
     ContextTypes,
     filters
 )
@@ -20,16 +20,22 @@ from owner_commands import handle_owner_command
 from keep_alive import keep_alive
 import g4f
 
+# Keep the bot alive (Render/Replit/Flask)
 keep_alive()
+
+# Load Bot Token
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
+# Logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 
+# Store previous chats
 previous_chats = []
 
+# AI Chat Function
 async def ai_reply(text):
     try:
         text_lower = text.lower()
@@ -55,7 +61,7 @@ async def ai_reply(text):
             "role": "system",
             "content": (
                 f"Tum ek real ladki ho, naam {CHARACTER_PROFILE['name']} hai. Tumhara style Hinglish hai, emotional, cute, friendly. "
-                "Most importang thing jitna tumse pucha jaye utna reply karo unnecessary questions nahi karo."
+                "Most importang thing jitna tumse pucha jaye utna reply karo unnecessary questions nahi karo. "
                 "Zyada lambi baatein mat karo — chhoti, sweet aur personal replies do with emojis jaise ladki apne doston se baat karti hai. "
                 f"Tum user ke pichle messages yaad rakhte ho aur ussi mood me reply karti ho. Kabhi bhi apne aap ko bot ya AI mat kehna. "
                 f"Owner: {CHARACTER_PROFILE['owner']}. Interests: {', '.join(CHARACTER_PROFILE['interests'])}. "
@@ -74,15 +80,19 @@ async def ai_reply(text):
             messages=[system_prompt] + previous_chats
         )
 
-        if response:
-            previous_chats.append({"role": "assistant", "content": response})
-        return response or "Kya bol rahe ho... samajh nahi aaya 🤔"
+        reply_text = str(response) if isinstance(response, str) else getattr(response, 'text', None)
+
+        if reply_text:
+            previous_chats.append({"role": "assistant", "content": reply_text})
+            return reply_text
+
+        return "Kya bol rahe ho... samajh nahi aaya 🤔"
 
     except Exception as e:
         logging.error(f"AI error: {e}")
         return "thoda busy hoon, baad me baat karti hu 😞"
 
-
+# Message Handler
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         me = await context.bot.get_me()
@@ -99,7 +109,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not (is_for_bot or is_private):
             return
 
-        await handle_owner_command(update, context)
         await context.bot.send_chat_action(chat_id=message.chat.id, action="typing")
 
         if any(name in user_msg for name in ["senorita", "sñorita", "senorita ji", "senorita didi"]):
@@ -117,29 +126,32 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logging.error(f"Error in message handler: {e}")
         await update.message.reply_text("Oops! Koi error aa gaya... sorry sorry! 😬")
 
-
+# Main Bot Setup
 async def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
-    # inside main()
+    # Group Commands with . prefix
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.warn$'), warn_user))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.mute$'), mute_user))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.ban$'), ban_user))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.unmute$'), unmute_user))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.unban$'), unban_user))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.unwarn$'), unwarn_user))
-    app.add_handler(MessageHandler(filters.Regex(r'(?i)^\ warn$') & filters.ChatType.GROUPS, warn_user))
 
+    # Plain command from owner: "senorita warn"
+    app.add_handler(MessageHandler(filters.Regex(r'(?i)^senorita warn$') & filters.ChatType.GROUPS, warn_user))
+
+    # AI Message Handler
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-
-    print("\nSenorita is live! DM ya group me kuch bolke dekho 💃")
+    print("\n✅ Senorita is live! DM ya group me kuch bolke dekho 💃")
 
     await app.run_polling()
 
-
+# Start Bot
 def run_bot():
     nest_asyncio.apply()
     loop = asyncio.get_event_loop()
     loop.create_task(main())
     loop.run_forever()
+
