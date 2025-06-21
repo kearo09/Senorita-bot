@@ -7,6 +7,7 @@ from telegram.ext import ContextTypes
 
 async def welcome_new_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
+        print("✅ Member update detected!")
         # Check if the user just joined
         if update.chat_member.old_chat_member.status in [ChatMemberStatus.LEFT, ChatMemberStatus.KICKED] and \
            update.chat_member.new_chat_member.status == ChatMemberStatus.MEMBER:
