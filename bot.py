@@ -58,7 +58,7 @@ async def ai_reply(text):
 
             previous_chats.append({"role": "user", "content": f"[user_id={user_id}] {text}"})
             if len(previous_chats) > 10:
-            previous_chats.pop(0)
+                previous_chats.pop(0)
 
             system_prompt = {
                 "role": "system",
