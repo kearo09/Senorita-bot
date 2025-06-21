@@ -39,7 +39,7 @@ logging.basicConfig(
 previous_chats = []
 
 # AI Chat Function
-async def ai_reply(text):
+async def ai_reply(text, user_id=None):
     try:
         text_lower = text.lower()
 
@@ -153,7 +153,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await message.reply_text(reply)
                 return
 
-        reply = await ai_reply(message.text)
+        reply = await ai_reply(message.text, user_id=message.from_user.id)
+
         await message.reply_text(reply)
 
     except Exception as e:
