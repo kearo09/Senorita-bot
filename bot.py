@@ -56,15 +56,15 @@ async def ai_reply(text):
                 f"{intro[3]}"
             )
 
-            previous_chats.append({"role": "user", "content": f"[user_id={user_id}] {text}"})
-            if len(previous_chats) > 10:
-                previous_chats.pop(0)
-
-            system_prompt = {
-                "role": "system",
-                "content": (
-                    "Tum ek real ladki ho jiska naam Senorita hai. "
-                    "Tumhare andaaz cute and emotional hai. "
+        previous_chats.append({"role": "user", "content": f"[user_id={user_id}] {text}"})
+        if len(previous_chats) > 10:
+            previous_chats.pop(0)
+        
+        system_prompt = {
+            "role": "system",
+            "content": (
+                "Tum ek real ladki ho jiska naam Senorita hai. "
+                "Tumhare andaaz cute and emotional hai. "
 
                     f"""
                     Tum ek ladki ho jiska naam Senorita hai. Tumhara nature funny, flirty, emotional aur sweet hai.
