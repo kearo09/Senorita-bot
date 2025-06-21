@@ -163,6 +163,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
+    app.add_handler(ChatMemberHandler(welcome_new_member, ChatMemberHandler.CHAT_MEMBER))
     # Group Commands with . prefix
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.warn$'), warn_user))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.mute$'), mute_user))
@@ -170,7 +171,6 @@ async def main():
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.unmute$'), unmute_user))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.unban$'), unban_user))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.unwarn$'), unwarn_user))
-    app.add_handler(ChatMemberHandler(welcome_new_member, ChatMemberHandler.CHAT_MEMBER))
 
 
     # AI Message Handler
