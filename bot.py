@@ -14,6 +14,8 @@ from telegram.ext import (
     filters
 )
 
+from telegram.ext import ChatMemberHandler
+from welcome import welcome_new_member
 from character import CHARACTER_PROFILE
 from group_commands import warn_user, mute_user, ban_user, unmute_user, unwarn_user, unban_user
 from owner_commands import handle_owner_command
@@ -168,6 +170,8 @@ async def main():
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.unmute$'), unmute_user))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.unban$'), unban_user))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'(?i)^\.unwarn$'), unwarn_user))
+    app.add_handler(ChatMemberHandler(welcome_new_member, ChatMemberHandler.CHAT_MEMBER))
+
 
     # AI Message Handler
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
